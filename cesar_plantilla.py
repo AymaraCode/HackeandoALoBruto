@@ -1,7 +1,7 @@
 import os
 import re
 import sys
-from random import *
+import random
 
 # Constantes
 rueda_cifrado = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -82,13 +82,13 @@ def num_coincidencias(lista_palabras, texto_candidato, min_sub, max_sub):
 #Metodo ya hecho
 def texto_plano(fichero_texto_plano:str):
     '''Pide al ususario que escriba un texto y se guarda en un fichero. Se pide línea a línea
-    y ,para acabar, pulsamos INTRO y luego CNTROL +D
+    y ,para acabar, pulsamos INTRO dos veces
     
     :param fichero_texto_plano: str nombre del fichero donde se guarda el texto plano
     '''
     #abro el fichero en modo lectura, falta comprobar que no exista ya
     #no estoy segura de si hacerlo dentro del metodo o al llamarlo, lo dejo así por el momento
-    f = open(fichero_texto_plano + ".txt", 'w', newline=None) #ojo al .txt 
+    f = open(fichero_texto_plano, 'w', newline=None) #ojo al .txt 
     print("Intoduzca su texto. Para terminar pulse dos veces intro.")
 
     #Lee lineas y la escribe en el fichero, si se introduce una linea vacía cierro fichero y salgo.
@@ -102,7 +102,7 @@ def texto_plano(fichero_texto_plano:str):
             break
     pass
 
-#Este esta empezado pero no cifra bien y la ñ no la coge
+
 def cifrar(fichero_texto_plano, fichero_cifrado_cesar):
     '''
     Dado un fichero de texto en plano y una clave aplica el cifrado César según los
@@ -120,49 +120,64 @@ def cifrar(fichero_texto_plano, fichero_cifrado_cesar):
     str | None Texto cifrado para la clave aleatoria o None si hubo algún error
 
     '''
-    archivoLectura = open(fichero_texto_plano, "r", newline=None, encoding="latin-1")
-    archivoEscritura = open(fichero_cifrado_cesar, "w", newline=None)
-    clave = random.randint(1, 26)
+    try:
+        archivoLectura = open(fichero_texto_plano, "r", newline=None, encoding="utf-8")
+        archivoEscritura = open(fichero_cifrado_cesar, "w", newline=None)
+        clave = 10 #random.randint(1, 26)
 
-    pivoteParaEspacios = 1
-    textoCifrado = ""
-    letra = "algo"
-    while(letra):
-        if pivoteParaEspacios > 5: 
-            archivoEscritura.write(" ") #Cada cinco caracteresescribo un espacio
-            pivoteParaEspacios = 0
-        letra = archivoLectura.read(1).upper() #Lee uno a uno los caracteres
-        if letra in [" ", ",", ".", ":", ";", ""]: continue #Ignora los espacios y signos de puntuacion
-        if ord(letra) > 64 and ord(letra) < 91: # Comprueba que los caracteres sean letras
+        textoCifrado = ""
+        textoSinEspacios = ""
+        textoConEspacios = ""
+        letra = "algo"
+
+        #Lee el archivo caracter a caracter y para cuando ya no quedan 
+        while(letra):
+            letra = archivoLectura.read(1).upper() #Lee uno a uno los caracteres
+
+            #Cuando se encuentra un salto de linea crea los espacios y escribe el texto en el archivo y lo suma a la variable textoCifrado que se devolverá
+            if letra == "\n":
+                for i in range(len(textoSinEspacios)):
+                    textoConEspacios += textoSinEspacios[i]
+                    if (i+1) % 5 == 0:
+                        textoConEspacios += " "
+                textoConEspacios += "\n"
+                archivoEscritura.write(textoConEspacios)
+                textoCifrado += textoConEspacios
+                textoConEspacios = ""
+                textoSinEspacios = ""
+                continue
+            if letra in [" ", ",", ".", ":", ";", ""]: continue #Ignora los espacios y signos de puntuacion
+            
             if letra == "Á": letra = "A"
-            elif letra == "É": letra = "E"
-            elif letra == "Í": letra = "I"
-            elif letra == "Ó": letra = "O"
-            elif letra == "Ú": letra = "U"
-            elif letra == "Ü": letra= "U"
+            if letra == "É": letra = "E"
+            if letra == "Í": letra = "I"
+            if letra == "Ó": letra = "O"
+            if letra == "Ú": letra = "U"
+            if letra == "Ü": letra= "U"
 
-            letraASCIIcifrada = ord(letra) + clave
+            if ord(letra) > 64 and ord(letra) < 91: # Comprueba que los caracteres sean letras
 
-            #Nuestras letras se encuentran entre 65 y en ascii 90 si se pasa de ese rango 
-            # debe volver a empezar así que se le resta 26 
-            if letraASCIIcifrada < 91:
-                archivoEscritura.write(chr(letraASCIIcifrada))
-                textoCifrado += chr(letraASCIIcifrada)
-            else:
-                archivoEscritura.write(chr(letraASCIIcifrada - 26))
-                textoCifrado += chr(letraASCIIcifrada - 26)
-        elif letra == "Ñ":
-            letraASCIIcifrada = ord("N") + clave
-            if letraASCIIcifrada < 91:
-                archivoEscritura.write(chr(letraASCIIcifrada) + chr(letraASCIIcifrada))
-                textoCifrado += chr(letraASCIIcifrada) + chr(letraASCIIcifrada)
-            else:
-                archivoEscritura.write(chr(letraASCIIcifrada - 26) + chr(letraASCIIcifrada - 26))
-                textoCifrado += chr(letraASCIIcifrada - 26) + chr(letraASCIIcifrada - 26)
-        else: # En caso contrario los escribe tal cual
-            archivoEscritura.write(letra)
-        pivoteParaEspacios += 1
-    return texto_cifrado
+                letraASCIIcifrada = ord(letra) + clave
+
+                #Nuestras letras se encuentran entre 65 y en ascii 90 si se pasa de ese rango 
+                # debe volver a empezar así que se le resta 26 
+                if letraASCIIcifrada < 91:
+                    textoSinEspacios += chr(letraASCIIcifrada)
+                else:
+                    textoSinEspacios += chr(letraASCIIcifrada - 26)
+            elif letra == "Ñ": #Excepcion para la letra ñ que debe escribirse como nn
+                letraASCIIcifrada = ord("N") + clave                                            #Calcula su valor como si fuera una n 
+                if letraASCIIcifrada < 91:
+                    textoSinEspacios += chr(letraASCIIcifrada) + chr(letraASCIIcifrada)     # y lo escribe dos veces
+                else:
+                    textoSinEspacios += chr(letraASCIIcifrada - 26) + chr(letraASCIIcifrada - 26)
+            else: # En caso contrario los escribe tal cual
+                textoSinEspacios += letra
+        archivoEscritura.close()
+        archivoLectura.close()
+        return textoCifrado
+    except Exception:
+        return None
 
 def descifra(fichero_cifrado_cesar, fichero_texto_plano_candidato, clave):
     '''
@@ -201,7 +216,7 @@ def descifras(texto_cifrado, clave):
     
     pass
 
-
+#Ya está hecha, pero falta comentarla!! Perdón :(
 def descifrar_fuerza_bruta(fichero_cifrado_cesar, fichero_resultados):
     '''
     Abre el fichero con el texto cifrado y saca los textos correspondientes 
@@ -215,11 +230,20 @@ def descifrar_fuerza_bruta(fichero_cifrado_cesar, fichero_resultados):
     :returns:
     stdout Todos los textos precedidos de la clave aplicada en cada caso.
     '''
-
-    '''###########################'''
-    '''RELLENA EL CÓDIGO QUE FALTA'''
-    '''###########################'''
     
+    for clave in range(1, 27):
+        letra = "algo"
+        archivoLectura = open(fichero_cifrado_cesar, "r", newline=None)
+        archivoEscritura = open(fichero_resultados + str(clave) + ".txt", "w", newline=None) 
+        while(letra):
+            letra = archivoLectura.read(1)
+            if letra in ["", " "]: continue
+            if ord(letra)>64 and ord(letra)<91:
+                letraASCII = ord(letra) + clave
+                if letraASCII > 90: letraASCII = letraASCII - 26
+                archivoEscritura.write(chr(letraASCII))
+            else:
+                archivoEscritura.write(letra)
     pass
 
 
@@ -310,7 +334,49 @@ def esIntAdecuado(numero, minimo, maximo):
         return False
     
 
+
+
+                          
+                          
+""""""""""""""""""""""""""
+""" PROGRAMA PRINCIPAL """   #Según Aymara
+""""""""""""""""""""""""""     
+while True:
+    opcion = menu()
+
+    if opcion == 1:
+        print("\nCREAR FICHERO EN TEXTO PLANO")
+        print("============================")
+        nombreArchivo = input("Introduzca un nombre para el archivo: ")
+        texto_plano(nombreArchivo + ".txt")
+    elif opcion == 2:
+        print("\nCIFRAR FICHERO")
+        print("================")
+        archivoPlano = input("¿Que archivo desea cifrar?(sin extensión)")
+        archivoCifrado = input("Introduzca un nombre para el archivo cifrado: ")
+        if cifrar(archivoPlano + ".txt", archivoCifrado + ".txt") is None:
+            print("Ha ocurrido un error. Probablemente el archivo " + archivoPlano + ".txt no se encontro en el directorio actual.")
+    elif opcion == 3: #Aquí falta después mostrar todos los mensajes con cada clave
+        print("\nFUERZA BRUTA Y RESOLUCIÓN \"A OJO\"")
+        print("===================================")
+        archivoCifrado = input("¿Que archivo desea descifrar?(sin extensión) ")
+        descifrar_fuerza_bruta(archivoCifrado + ".txt", archivoCifrado + "_clave")
+        pass
+    elif opcion == 4:
+        pass
+    elif opcion == 5:
+        break
+
+
+
+
+
+
+#Esto de aquí abajo es el programa principal según el profe
 if __name__ == "__main__":
+
+   
+
 
     lista_palabras_castellano = procesar("Diccionario.txt")
     # print(lista_palabras)
