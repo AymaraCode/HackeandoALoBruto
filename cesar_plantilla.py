@@ -57,7 +57,6 @@ def procesar(dicc):
         return []
 
 
-
 def max_palabra(lista_palabras):
     '''
     Retorna el tamaño máximo de palabra en la lista de palabras en castellano
@@ -67,11 +66,9 @@ def max_palabra(lista_palabras):
     int Tamaño máximo encontrado
     '''
 
-    '''###########################'''
-    '''RELLENA EL CÓDIGO QUE FALTA'''
-    '''###########################'''
-
-    pass
+    # Mapear la lista de palabras al tamaño de cada palabra, y 
+    # devolver el máximo de dicha lista
+    return max(list(map(lambda palabra: len(palabra), lista_palabras)))
 
 
 def num_coincidencias(lista_palabras, texto_candidato, min_sub, max_sub):
