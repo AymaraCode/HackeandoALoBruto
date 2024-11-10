@@ -24,15 +24,30 @@ def procesar(dicc):
         todo = d.read()
         lista = todo.splitlines() # genero lista y elimino basurilla del final de cada palabra
 
-        # proceso de la lista
-
-        '''###########################'''
-        '''RELLENA EL CÓDIGO QUE FALTA'''
-        '''###########################'''
-
-        d.close()
-            
-        return lista
+        # proceso de la lista        
+        lista_procesada = []
+        for palabra in lista:
+            if len(list(palabra))> 3:
+                palabraNueva = ""
+                for letra in palabra.upper():
+                    if letra == "Á":
+                        palabraNueva += "A"
+                    elif letra == "É":
+                        palabraNueva += "E"
+                    elif letra == "Í":
+                        palabraNueva += "I"
+                    elif letra == "Ó":
+                        palabraNueva += "O"
+                    elif letra == "Ú":
+                        palabraNueva += "U"
+                    elif letra =="Ñ":
+                        palabraNueva += "NN"
+                    elif letra == "Ü":
+                        palabraNueva += "U"
+                    else:
+                        palabraNueva += letra
+                lista_procesada.append(palabraNueva)        
+        return lista_procesada
 
     except FileNotFoundError:
         print('Fichero "{0}" no encontrado.\nPor favor, escriba correctamente el nombre del fichero y/o la ruta'.format(dicc))
