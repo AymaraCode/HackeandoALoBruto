@@ -209,12 +209,38 @@ def descifras(texto_cifrado, clave):
     :returns:
     str Texto descifrado
     '''
-
-    '''###########################'''
-    '''RELLENA EL CÓDIGO QUE FALTA'''
-    '''###########################'''
     
-    pass
+    # SIN AÑADIR LA Ñ A LA RUEDA CUANDO SE HACE LA ROTACIÓN Y ES UNA N
+    # SE DESCIFRA EN UNA 'M' (POSIBLE FALLO SIN ARREGLAR?)
+    rueda_descifrado = 'ABCDEFGHIJKLMNÑOPQRSTUVWXYZ'
+    texto_descifrado = ""
+    
+    # Recorrer cada caracter del texto a descifrar
+    for letra in texto_cifrado:
+        # Convertir los caracteres a mayusculas para posterior busqueda
+        # en rueda_descifrado
+        letra = letra.upper()
+
+        # Los espacios en blanco y cualquier caracter que no sea letra 
+        # se dejan igual 
+        if letra in ["", " "] or ord(letra) > 90 or ord(letra) < 65: 
+            texto_descifrado += letra
+            continue
+        
+        # Buscar la posicion de la letra en la rueda
+        pos_letra_rueda = rueda_descifrado.find(letra)
+        # Buscar la letra correspondiente en el string de la rueda de descifrado 
+        # utilizando la posicion de la letra en sentido contrario
+        letra_descifrada = rueda_descifrado[(pos_letra_rueda - clave) % 26] 
+    
+        print(f"posicion de la letra {letra}: {pos_letra_rueda} con pivoteo: {(pos_letra_rueda - clave) % 26} es {letra_descifrada}")
+        # Concatenar el caracter encontrado al string que se devolverá
+        texto_descifrado += letra_descifrada
+
+        
+    return texto_descifrado
+
+
 
 #Ya está hecha, pero falta comentarla!! Perdón :(
 def descifrar_fuerza_bruta(fichero_cifrado_cesar, fichero_resultados):
