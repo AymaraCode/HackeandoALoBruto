@@ -6,6 +6,32 @@ import random
 # Constantes
 rueda_cifrado = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
+# FUNCION PROVISIONAL (NO SÉ SI SE PUEDE) PARA ABRIR ARCHIVOS Y MANEJAR ERRORES
+def abrir_fichero_multiplataforma(ruta_fichero:str, accion:str):
+    '''
+    Abre el fichero comprobando si ocurre alguna excepcion
+
+    :param fichero: str Fichero que se va a abrir
+    
+    :returns: 
+    fichero, si no ocurre ningun error
+    '''
+    try:
+        # Abrir el fichero
+        # La librería en Linux falla si no se hace así ...
+        if os.name == 'posix':  # Linux, MacOS
+            fichero = open(ruta_fichero, accion, encoding='latin-1')
+        else:                   # Windows
+            fichero = open(ruta_fichero, accion)
+            
+    except FileNotFoundError:
+        print('Fichero "{0}" no encontrado.\nPor favor, escriba correctamente el nombre del fichero y/o la ruta'.format(ruta_fichero))
+        return None
+    except:
+        print("Error inesperado: {0}".format(sys.exc_info()[0]))
+        return None
+    
+    return fichero
 
 def procesar(dicc):
     '''Lee el fichero del diccionario y lo procesa: sin tildes ni diéresis, mayúsculas 
@@ -83,7 +109,6 @@ def num_coincidencias(lista_palabras, texto_candidato, min_sub, max_sub):
     :returns:
     int Número de coincidencias en el diccionario
     '''
-    
     # Generar las subcadenas posibles entre tamaño min_sub y max_sub
     lista_subcadenas = [texto_candidato[:i] for i in range(min_sub, max_sub+1)]
     
@@ -121,7 +146,7 @@ def texto_plano(fichero_texto_plano:str):
         else:
             f.close()
             break
-    pass
+    
 
 
 def cifrar(fichero_texto_plano, fichero_cifrado_cesar):
@@ -241,9 +266,11 @@ def descifras(texto_cifrado, clave):
         # en rueda_descifrado
         letra = letra.upper()
 
-        # Los espacios en blanco y cualquier caracter que no sea letra 
-        # se dejan igual 
-        if letra in ["", " "] or ord(letra) > 90 or ord(letra) < 65: 
+        # Los espacios en blanco se ignoran
+        if letra in ["", " "]: continue
+        
+        # los signos se dejan igual
+        if ord(letra) > 90 or ord(letra) < 65: 
             texto_descifrado += letra
             continue
         
@@ -253,7 +280,6 @@ def descifras(texto_cifrado, clave):
         # utilizando la posicion de la letra en sentido contrario
         letra_descifrada = rueda_cifrado[(pos_letra_rueda - clave) % 26] 
     
-        print(f"posicion de la letra {letra}: {pos_letra_rueda} con pivoteo: {(pos_letra_rueda - clave) % 26} es {letra_descifrada}")
         # Concatenar el caracter encontrado al string que se devolverá
         texto_descifrado += letra_descifrada
 
@@ -290,7 +316,7 @@ def descifrar_fuerza_bruta(fichero_cifrado_cesar, fichero_resultados):
                 archivoEscritura.write(chr(letraASCII))
             else:
                 archivoEscritura.write(letra)
-    pass
+
 
 
 def descifrar_fuerza_bruta_dic(fichero_cifrado_cesar, fichero_resultado, diccionario:list , porcentaje=0.25, rapido=False, minPalabra=None, maxPalabra=None):
@@ -318,11 +344,78 @@ def descifrar_fuerza_bruta_dic(fichero_cifrado_cesar, fichero_resultado, diccion
     informa de ello
     '''
     
-    '''###########################'''
-    '''RELLENA EL CÓDIGO QUE FALTA'''
-    '''###########################'''
+    # Comprobar si se requiere un descifrado rápido, en cuyo caso harán falta
+    # los parametros minPalabra y maxPalabra
+    if(rapido and (minPalabra == None or maxPalabra == None)):
+        print('No se especificaron tamaño minimo y maximo de subcadenas para'
+              +' un descifrado rápido')
+        return
     
-    pass
+    
+    
+    # Guardar el contenido del fichero en variable texto_cifrado
+    texto_cifrado = fichero_cifrado_cesar.read()
+            
+    # Diccionario con las coincidencias de cada clave en la lista de palabras
+    clave_coincidencias = {}
+    # Diccionario con las claves y el resultado de aplicarla en el descifrado
+    clave_descifrado = {}
+    for clave in range(1,26):
+        # descifrar el texto cifrado con la funcion descifras y cada clave
+        txt_descifrado_clave = descifras(texto_cifrado, clave)
+        # Si no es rápido se especifica tamaño minimo de palabra igual al máximo
+        # para no crear ninguna subcadena
+        if(not rapido):
+            minPalabra = 1
+            maxPalabra = len(txt_descifrado_clave)
+            
+        # comprobar cuantas coincidencias hay de las subcadenas del texto en el diccionario
+        coincidencias = num_coincidencias(diccionario, txt_descifrado_clave, minPalabra, maxPalabra)
+        # Guardar la clave y las coincidencias encontradas en la lista de palabras
+        # en el diccionario
+        clave_coincidencias[clave] = coincidencias    
+        # Guardar las claves y el resultado de aplicarlas en el texto
+        clave_descifrado[clave] = txt_descifrado_clave
+            
+    # Buscar la clave con más coincidencias en el diccionario de {clave, coincidencias} 
+    # se obtiene buscando el mayor valor en las tuplas del diccionario, y obteniendo de esta su clave correspondiente: elemento[0]   
+    clave_max_coincidencias = max(clave_coincidencias.items(), key= lambda x: x[1])[0]
+    print(clave_max_coincidencias)
+    
+    # Buscar la mayor cantidad de coincidencias, de la clave anterior
+    max_coincidencias = clave_coincidencias[clave_max_coincidencias]
+    print(max_coincidencias)
+
+    
+    print('\n')
+    # Imprimir soluciones y guardarlas en fichero_resultado
+    for clave, texto_descifrado in clave_descifrado.items():
+        # String de informacion sobre la clave, que se va a imprimir, y a escribir en archivo
+        str_info_clave_coincidencia = f'Clave {clave} descifrada como {texto_descifrado},con {clave_coincidencias[clave]} coincidencias'        
+        
+        #Comprobar si es solucion definitiva o alternativa
+        if(clave == clave_max_coincidencias):
+            # Concatenar la informacion al string que se va a mostrar
+            str_info_clave_coincidencia += "--- SOLUCION DEFINITIVA! ---"
+        else:
+            if(max_coincidencias > 0):
+                # Calcular porcentaje de coincidencia de cada clave sobre 1
+                porcentaje_coincidencia = clave_coincidencias[clave] / max_coincidencias
+                # Comprobar Si el porcentaje de coincidencia de la clave es mayor al porcentaje 
+                # pasado como parametro para determinar solucion alternativa
+                if(porcentaje_coincidencia >= porcentaje):
+                    # Concatenar la informacion al string que se va a mostrar
+                    str_info_clave_coincidencia += "SOLUCION ALTERNATIVA!"
+                
+        # Imprimir información de cada descifrado
+        print(str_info_clave_coincidencia + '\n')
+        # Escribir información de cada descifrado al fichero_resultado
+        fichero_resultado.write(str_info_clave_coincidencia + '\n') 
+        
+    fichero_cifrado_cesar.close()
+    fichero_resultado.close()   
+                
+            
 
 def menu():
     '''Muestra un menú por pantalla
@@ -407,9 +500,72 @@ while True:
         print("===================================")
         archivoCifrado = input("¿Que archivo desea descifrar?(sin extensión) ")
         descifrar_fuerza_bruta(archivoCifrado + ".txt", archivoCifrado + "_clave")
-        pass
     elif opcion == 4:
-        pass
+        print("\nFUERZA BRUTA Y RESOLUCIÓN POR DICCIONARIO")
+        print("===================================")
+        
+        # Pedir el archivo que se quiere descifrar
+        # Mientras el archivo sea None, la funcion abrir_fichero_multiplataforma
+        # no pudo encontrarlo
+        archivoCifrado = None
+        while(not archivoCifrado):
+            rutaArchivoCifrado = input("¿Que archivo desea descifrar?(sin extensión) ")
+            archivoCifrado = abrir_fichero_multiplataforma(f'{rutaArchivoCifrado}.txt', 'r')
+        
+        # Pedir el archivo donde se guardará el resultado de descifrado
+        # Mientras el archivo sea None, la funcion abrir_fichero_multiplataforma
+        # no pudo encontrarlo
+        archivoResultado = None
+        while(not archivoResultado):
+            rutaArchivoResultado = input("¿En qué archivo quieres guardar el texto descifrado?(sin extensión) ")
+            archivoResultado = abrir_fichero_multiplataforma(f'{rutaArchivoResultado}.txt', 'w')
+        
+        # Pedir el archivo que contiene el diccionario
+        listaDiccionario = []
+        # Mientras la lista esté vacía, es que no se ha podido encontrar el 
+        # archivo que escribió el usuario
+        while(not listaDiccionario):
+            archivoDiccionario = input("¿Cuál es el archivo con el diccionario?(sin extensión) ")
+            # Extraer del archivo diccionario, la lista de palabras
+            listaDiccionario = procesar(f'{archivoDiccionario}.txt')
+            
+        # Pedir el porcentaje para buscar claves alternativas, comprobando que
+        # sea un flotante entre 0 y 1
+        porcentaje = 1
+        while(True):
+            if(esFlotanteAdecuado(porcentaje = input('¿Qué porcentaje de coincidencias quieres utilizar para las soluciones alternativas? (ENTRE 0 Y 1) '))):
+                break
+        
+        # Preguntar si desea la opción rápida de descifrado
+        opcionRapido = input('¿Quieres hacer un descifrado con la opcion rapido?(S/N)').lower()
+        # validación de input con regex para opcion rápido solo valido S o N como respuesta
+        modelo_regex_valid = re.compile(r'[s|n]')
+        while modelo_regex_valid.fullmatch(opcionRapido) == None:
+            print('ERROR: Debes responder S(sí) o N(no)')
+        
+        # si se elige la opcion rápido pedir minimo y máximo para subccadneas
+        minPalabra = 0
+        maxPalabra = 0
+        
+        if(opcionRapido == 's'):
+            while True:
+                try:
+                    # el tamaño minimo para las palabras debe ser 1
+                    while(minPalabra <= 0):
+                        minPalabra = int(input('¿Qué tamaño minimo quieres para comprobar palabras? (MAYOR A 0)'))
+                    
+                    # el tamamño máximo para las palabras debe ser mayor que el mínimo
+                    while(maxPalabra <= minPalabra):
+                        maxPalabra = int(input('¿Qué tamaño máximo quieres para comprobar palabras? (MAYOR AL MINIMO)'))
+                    
+                    break
+                
+                except ValueError:
+                    # si se inserta algo que no sea número da error
+                    print("ERROR: Debes insertar un número. ")
+            
+        
+        descifrar_fuerza_bruta_dic(archivoCifrado, archivoResultado, listaDiccionario, porcentaje,False, minPalabra, maxPalabra)
     elif opcion == 5:
         break
 
