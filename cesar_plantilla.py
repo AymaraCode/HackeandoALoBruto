@@ -70,7 +70,6 @@ def max_palabra(lista_palabras):
     # devolver el máximo de dicha lista
     return max(list(map(lambda palabra: len(palabra), lista_palabras)))
 
-
 def num_coincidencias(lista_palabras, texto_candidato, min_sub, max_sub):
     '''
     Compara el todas las posibles subcadenas de texto_candidato entre los tamaños
@@ -84,12 +83,22 @@ def num_coincidencias(lista_palabras, texto_candidato, min_sub, max_sub):
     :returns:
     int Número de coincidencias en el diccionario
     '''
-
-    '''###########################'''
-    '''RELLENA EL CÓDIGO QUE FALTA'''
-    '''###########################'''
     
-    pass
+    # Generar las subcadenas posibles entre tamaño min_sub y max_sub
+    lista_subcadenas = [texto_candidato[:i] for i in range(min_sub, max_sub+1)]
+    
+    # Variable donde se contarán las coincidencias que vayan apareciendo 
+    # de cada subcadena
+    coincidencias = 0
+    # Recorrer cada palabra en la lista de palabras
+    for palabra in lista_palabras:
+        # Por cada palabra de la lista se comprueba cada subcadena generada previamente
+        for subcadena in lista_subcadenas:
+            # Si la subcadena coincide con la palabra se suma a las coincidencias
+            coincidencias += (subcadena == palabra)
+                
+    return coincidencias
+            
 
 #Metodo ya hecho
 def texto_plano(fichero_texto_plano:str):
@@ -224,7 +233,6 @@ def descifras(texto_cifrado, clave):
     
     # SIN AÑADIR LA Ñ A LA RUEDA CUANDO SE HACE LA ROTACIÓN Y ES UNA N
     # SE DESCIFRA EN UNA 'M' (POSIBLE FALLO SIN ARREGLAR?)
-    rueda_descifrado = 'ABCDEFGHIJKLMNÑOPQRSTUVWXYZ'
     texto_descifrado = ""
     
     # Recorrer cada caracter del texto a descifrar
@@ -240,10 +248,10 @@ def descifras(texto_cifrado, clave):
             continue
         
         # Buscar la posicion de la letra en la rueda
-        pos_letra_rueda = rueda_descifrado.find(letra)
+        pos_letra_rueda = rueda_cifrado.find(letra)
         # Buscar la letra correspondiente en el string de la rueda de descifrado 
         # utilizando la posicion de la letra en sentido contrario
-        letra_descifrada = rueda_descifrado[(pos_letra_rueda - clave) % 26] 
+        letra_descifrada = rueda_cifrado[(pos_letra_rueda - clave) % 26] 
     
         print(f"posicion de la letra {letra}: {pos_letra_rueda} con pivoteo: {(pos_letra_rueda - clave) % 26} es {letra_descifrada}")
         # Concatenar el caracter encontrado al string que se devolverá
