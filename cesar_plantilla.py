@@ -109,6 +109,8 @@ def num_coincidencias(lista_palabras, texto_candidato, min_sub, max_sub):
     :returns:
     int Número de coincidencias en el diccionario
     '''
+    #Convierte la lista de palabras a set para agilizar la búsqueda
+    set_palabras = set(lista_palabras)
     # Contar las coincidencias que encuentra en cada subcadena del texto candidato
     coincidencias = 0
     # por cada caracter en el string texto_candidato(i)
@@ -117,9 +119,8 @@ def num_coincidencias(lista_palabras, texto_candidato, min_sub, max_sub):
         for j in range(i+min_sub, min((i+max_sub+1), len(texto_candidato)+1)):
             # comprobar que no se pase del tamaño del texto_candidato
             subcadena = texto_candidato[i:j]
-            coincidencias += (subcadena in lista_palabras)
-                
-    print(lista_subcadenas)
+            coincidencias += (subcadena in set_palabras)
+            
     
     return coincidencias
             
@@ -362,7 +363,8 @@ def descifrar_fuerza_bruta_dic(fichero_cifrado_cesar, fichero_resultado, diccion
         return None
             
     # Diccionario con las coincidencias de cada clave en la lista de palabras
-    clave_coincidencias = {}
+    clave_coincidencias = {} # -> Lista ordenada por valores de claves
+    
     # Diccionario con las claves y el resultado de aplicarla en el descifrado
     clave_descifrado = {}
     for clave in range(1,26):
@@ -385,12 +387,12 @@ def descifrar_fuerza_bruta_dic(fichero_cifrado_cesar, fichero_resultado, diccion
     # Buscar la clave con más coincidencias en el diccionario de {clave, coincidencias} 
     # se obtiene buscando el mayor valor en las tuplas del diccionario, y obteniendo de esta su clave correspondiente: elemento[0]   
     clave_max_coincidencias = max(clave_coincidencias.items(), key= lambda x: x[1])[0]
-    print(clave_max_coincidencias)
+    
     
     # Buscar la mayor cantidad de coincidencias, de la clave anterior
     max_coincidencias = clave_coincidencias[clave_max_coincidencias]
-    print(max_coincidencias)
-
+    
+    
     
     print('\n')
     # Imprimir soluciones y guardarlas en fichero_resultado
