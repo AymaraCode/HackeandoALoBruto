@@ -140,18 +140,21 @@ def texto_plano(fichero_texto_plano:str):
     '''
     #abro el fichero en modo lectura, falta comprobar que no exista ya
     #no estoy segura de si hacerlo dentro del metodo o al llamarlo, lo dejo así por el momento
-    f = open(fichero_texto_plano, 'w', newline=None, encoding="utf-8") #ojo al .txt 
-    print("Intoduzca su texto. Para terminar pulse dos veces intro.")
+    try:
+        f = open(fichero_texto_plano, 'w', newline=None, encoding="utf-8") #ojo al .txt 
+        print("Intoduzca su texto. Para terminar pulse dos veces intro.")
 
-    #Lee lineas y la escribe en el fichero, si se introduce una linea vacía cierro fichero y salgo.
-    while True:
-        linea = input()
-        if (linea):
-            f.write(linea + "\n")
-        else:
-            f.close()
-            break
-    
+        #Lee lineas y la escribe en el fichero, si se introduce una linea vacía cierro fichero y salgo.
+        while True:
+            linea = input()
+            if (linea):
+                f.write(linea + "\n")
+            else:
+                f.close()
+                break
+    except Exception as er:
+        print("Hubo un error al intentar abrir o escribir: " + fichero_texto_plano + "\n" + str(er))
+        return None
 
 
 def cifrar(fichero_texto_plano, fichero_cifrado_cesar):
@@ -175,7 +178,7 @@ def cifrar(fichero_texto_plano, fichero_cifrado_cesar):
     try: 
         textoPlano = open(fichero_texto_plano, "r", newline=None, encoding="utf-8").read() #Lee el archivo de texto plano y guarda el texto en la variable textoPlano
     except Exception as er:
-        print("Hubo un error al intentar leer: " + fichero_texto_plano + "\n" + str(er))
+        print("Hubo un error al intentar abrir o leer: " + fichero_texto_plano + "\n" + str(er))
         return None
     textoCifrado = "" #Variable donde se añadiran las letras cifradas una a una
     clave = random.randint(1, 25) #La clave sera aleatoria del 1 al 25
@@ -218,7 +221,7 @@ def cifrar(fichero_texto_plano, fichero_cifrado_cesar):
     try:
         open(fichero_cifrado_cesar, "w", newline=None).write(textoConEspacios)
     except Exception as ew:
-        print("Hubo un error al intentar escribir el fichero: " + fichero_cifrado_cesar + "\n" + str(ew))
+        print("Hubo un error al intentar abrir o escribir el fichero: " + fichero_cifrado_cesar + "\n" + str(ew))
         return None
     return textoConEspacios #Devuelve el texto cifrado con espacios 
 
@@ -319,7 +322,7 @@ def descifrar_fuerza_bruta(fichero_cifrado_cesar, fichero_resultados):
                 claves += "Clave " + str(clave) + ": " + intentoDescifrar + "\n" 
                 ficheroEscritura.write(intentoDescifrar)
     except Exception as ew:
-        print("Hubo un error al intentar escribir ficheros\n" + str(ew))
+        print("Hubo un error al intentar abrir o escribir ficheros\n" + str(ew))
     return claves #Devuelve todas las opciones de descifrado
 
 
@@ -359,7 +362,11 @@ def descifrar_fuerza_bruta_dic(fichero_cifrado_cesar, fichero_resultado, diccion
     
     
     # Guardar el contenido del fichero en variable texto_cifrado
-    texto_cifrado = fichero_cifrado_cesar.read()
+    try:
+        texto_cifrado = fichero_cifrado_cesar.read()
+    except Exception as er:
+        print("Hubo un error al intentar leer: " + fichero_cifrado_cesar + "\n" + str(er))
+        return None
             
     # Diccionario con las coincidencias de cada clave en la lista de palabras
     clave_coincidencias = {}
@@ -415,8 +422,13 @@ def descifrar_fuerza_bruta_dic(fichero_cifrado_cesar, fichero_resultado, diccion
         # Imprimir información de cada descifrado
         print(str_info_clave_coincidencia + '\n')
         # Escribir información de cada descifrado al fichero_resultado
-        fichero_resultado.write(str_info_clave_coincidencia + '\n') 
+        try:
+            fichero_resultado.write(str_info_clave_coincidencia + '\n') 
+        except Exception as er:
+            print("Hubo un error al intentar escribir en: " + fichero_resultado + "\n" + str(er))
+            return
         
+    
     fichero_cifrado_cesar.close()
     fichero_resultado.close()   
                 
@@ -581,12 +593,9 @@ while True:
 
 
 
+
 #Esto de aquí es para probar según el profe
 if __name__ == "__main__":
-
-   
-
-
     lista_palabras_castellano = procesar("Diccionario.txt")
     # print(lista_palabras)
 
