@@ -110,8 +110,14 @@ def num_coincidencias(lista_palabras, texto_candidato, min_sub, max_sub):
     int Número de coincidencias en el diccionario
     '''
     # Generar las subcadenas posibles entre tamaño min_sub y max_sub
-    lista_subcadenas = [texto_candidato[:i] for i in range(min_sub, max_sub+1)]
-    
+    lista_subcadenas = []
+    # por cada caracter en el string texto_candidato(i)
+    for i in range(len(texto_candidato)):
+        # genera las cadenas hasta el ultimo caracter
+        for j in range(i+1, len(texto_candidato) + 1):
+            # añadir cada subcadena posible a la lista_subcadenas
+            lista_subcadenas.append(texto_candidato[i:j])
+            
     # Variable donde se contarán las coincidencias que vayan apareciendo 
     # de cada subcadena
     coincidencias = 0
