@@ -395,6 +395,9 @@ def descifrar_fuerza_bruta_dic(fichero_cifrado_cesar, fichero_resultado, diccion
     
     
     print('\n')
+    str_soluciones_def_alt = f'Clave definitiva: {clave_max_coincidencias} : {max_coincidencias} \n'
+    str_todas_soluciones = ""
+    
     # Imprimir soluciones y guardarlas en fichero_resultado
     for clave, texto_descifrado in clave_descifrado.items():
         # String de informacion sobre la clave, que se va a imprimir, y a escribir en archivo
@@ -404,6 +407,7 @@ def descifrar_fuerza_bruta_dic(fichero_cifrado_cesar, fichero_resultado, diccion
         if(clave == clave_max_coincidencias):
             # Concatenar la informacion al string que se va a mostrar
             str_info_clave_coincidencia += "--- SOLUCION DEFINITIVA! ---"
+            
         else:
             if(max_coincidencias > 0):
                 # Calcular porcentaje de coincidencia de cada clave sobre 1
@@ -411,17 +415,23 @@ def descifrar_fuerza_bruta_dic(fichero_cifrado_cesar, fichero_resultado, diccion
                 # Comprobar Si el porcentaje de coincidencia de la clave es mayor al porcentaje 
                 # pasado como parametro para determinar solucion alternativa
                 if(porcentaje_coincidencia >= porcentaje):
+                    # añadir la clave alternativa al string de claves alternativas para imprimir 
+                    str_soluciones_def_alt += f'Clave alternativa: {clave} : {clave_coincidencias[clave]} \n'
                     # Concatenar la informacion al string que se va a mostrar
                     str_info_clave_coincidencia += "SOLUCION ALTERNATIVA!"
                 
         # Imprimir información de cada descifrado
-        print(str_info_clave_coincidencia + '\n')
+        str_todas_soluciones += str_info_clave_coincidencia + '\n'
+        
         # Escribir información de cada descifrado al fichero_resultado
         try:
             fichero_resultado.write(str_info_clave_coincidencia + '\n') 
         except Exception as er:
             print("Hubo un error al intentar escribir en: " + fichero_resultado + "\n" + str(er))
             return
+        
+    # Imprimir información de cada descifrado
+    print(str_soluciones_def_alt + '\n\n' + str_todas_soluciones)
         
     
     fichero_cifrado_cesar.close()
@@ -547,8 +557,12 @@ while True:
         # sea un flotante entre 0 y 1
         porcentaje = 1
         while(True):
-            if(esFlotanteAdecuado(porcentaje = input('¿Qué porcentaje de coincidencias quieres utilizar para las soluciones alternativas? (ENTRE 0 Y 1) '))):
+            porcentaje = input('¿Qué porcentaje de coincidencias quieres utilizar para las soluciones alternativas? (ENTRE 0 Y 1) ')
+            if(esFlotanteAdecuado(porcentaje)):
+                porcentaje = float(porcentaje)
                 break
+        
+        print(porcentaje)
         
         # Preguntar si desea la opción rápida de descifrado
         opcionRapido = input('¿Quieres hacer un descifrado con la opcion rapido?(S/N)').lower()
