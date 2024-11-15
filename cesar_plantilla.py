@@ -1,3 +1,9 @@
+'''
+ TRABAJO DE LA UNIDAD 3 DE ACCESO A DATOS, REALIZADO EN GRUPO POR 
+ - Aymara Aguayo Rojas
+ - Wilbert López Veras
+'''
+
 import os
 import re
 import sys
@@ -6,7 +12,6 @@ import random
 # Constantes
 rueda_cifrado = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
-# FUNCION PROVISIONAL (NO SÉ SI SE PUEDE) PARA ABRIR ARCHIVOS Y MANEJAR ERRORES
 def abrir_fichero_multiplataforma(ruta_fichero:str, accion:str):
     '''
     Abre el fichero comprobando si ocurre alguna excepcion
@@ -443,7 +448,7 @@ def menu():
     '''Muestra un menú por pantalla
 
     :returns:
-    int opción escojida
+    int opción escogida
     '''
     print('\n*** Hackeando, a lo bruto, a Julio César ***')
     print('1) Crear fichero en texto plano')
