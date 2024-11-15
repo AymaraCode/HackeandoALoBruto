@@ -134,7 +134,7 @@ def texto_plano(fichero_texto_plano:str):
     '''
     #abro el fichero en modo lectura, falta comprobar que no exista ya
     #no estoy segura de si hacerlo dentro del metodo o al llamarlo, lo dejo así por el momento
-    f = open(fichero_texto_plano, 'w', newline=None) #ojo al .txt 
+    f = open(fichero_texto_plano, 'w', newline=None, encoding="utf-8") #ojo al .txt 
     print("Intoduzca su texto. Para terminar pulse dos veces intro.")
 
     #Lee lineas y la escribe en el fichero, si se introduce una linea vacía cierro fichero y salgo.
@@ -167,7 +167,7 @@ def cifrar(fichero_texto_plano, fichero_cifrado_cesar):
     '''
     
     try: 
-        textoPlano = open(fichero_texto_plano, "r", newline=None, encoding="latin-1").read() #Lee el archivo de texto plano y guarda el texto en la variable textoPlano
+        textoPlano = open(fichero_texto_plano, "r", newline=None, encoding="utf-8").read() #Lee el archivo de texto plano y guarda el texto en la variable textoPlano
     except Exception as er:
         print("Hubo un error al intentar leer: " + fichero_texto_plano + "\n" + str(er))
         return None
