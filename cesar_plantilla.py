@@ -123,7 +123,7 @@ def cifrar(fichero_texto_plano, fichero_cifrado_cesar):
     try:
         archivoLectura = open(fichero_texto_plano, "r", newline=None, encoding="utf-8")
         archivoEscritura = open(fichero_cifrado_cesar, "w", newline=None)
-        clave = 10 #random.randint(1, 26)
+        clave = random.randint(1, 26)
 
         textoCifrado = ""
         textoSinEspacios = ""
@@ -354,14 +354,14 @@ while True:
         print("================")
         archivoPlano = input("¿Que archivo desea cifrar?(sin extensión)")
         archivoCifrado = input("Introduzca un nombre para el archivo cifrado: ")
-        if cifrar(archivoPlano + ".txt", archivoCifrado + ".txt") is None:
+        exito = cifrar(archivoPlano + ".txt", archivoCifrado + ".txt")
+        if exito is None:
             print("Ha ocurrido un error. Probablemente el archivo " + archivoPlano + ".txt no se encontro en el directorio actual.")
     elif opcion == 3: #Aquí falta después mostrar todos los mensajes con cada clave
         print("\nFUERZA BRUTA Y RESOLUCIÓN \"A OJO\"")
         print("===================================")
         archivoCifrado = input("¿Que archivo desea descifrar?(sin extensión) ")
         descifrar_fuerza_bruta(archivoCifrado + ".txt", archivoCifrado + "_clave")
-        pass
     elif opcion == 4:
         pass
     elif opcion == 5:
@@ -372,7 +372,7 @@ while True:
 
 
 
-#Esto de aquí abajo es el programa principal según el profe
+#Esto de aquí es para probar según el profe
 if __name__ == "__main__":
 
    
