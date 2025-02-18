@@ -1,0 +1,14 @@
+class MainActivity : ComponentActivity() {
+      override fun onCreate(savedInstanceState: Bundle?) {
+          super.onCreate(savedInstanceState)
+          enableEdgeToEdge()
+          setContent {
+              TaskManagerTheme {
+                  val taskViewModel by viewModels<TaskViewModel>() //A saber pa que
+                  Navigation(taskViewModel)
+              }
+          }
+      }
+  }
+
+ 

@@ -1,0 +1,90 @@
+//Menu no editable
+
+var showMenu by rememberSaveable { mutableStateOf(false) }
+var selectedOption by rememberSaveable { mutableStateOf("Selecciona una opción") }
+
+ExposedDropdownMenuBox(
+    expanded = showMenu,
+    onExpandedChange = { showMenu = !showMenu }
+) {
+    OutlinedTextField(
+        value = selectedOption,
+        onValueChange = {},
+        label = { Text("Seleccionar clase") },
+        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = showMenu) },
+        modifier = Modifier.menuAnchor()
+    )
+    ExposedDropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
+        listOf("Bárbaro", "Brujo", "Guerrero").forEach { option ->
+            DropdownMenuItem(
+                text = { Text(option) },
+                onClick = {
+                    selectedOption = option
+                    showMenu = false
+                }
+            )
+        }
+    }
+}
+
+
+// Menu editable
+var showMenu by rememberSaveable { mutableStateOf(false) }
+var selectedOption by rememberSaveable { mutableStateOf("") }
+
+ExposedDropdownMenuBox(
+    expanded = showMenu,
+    onExpandedChange = { showMenu = !showMenu }
+) {
+    OutlinedTextField(
+        value = selectedOption,
+        onValueChange = { selectedOption = it },
+        label = { Text("Clase (editable)") },
+        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = showMenu) },
+        modifier = Modifier.menuAnchor()
+    )
+    ExposedDropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
+        listOf("Bárbaro", "Brujo", "Guerrero").forEach { option ->
+            DropdownMenuItem(
+                text = { Text(option) },
+                onClick = {
+                    selectedOption = option
+                    showMenu = false
+                }
+            )
+        }
+    }
+}
+
+
+//Menu editable con autocompletado
+
+var showMenu by rememberSaveable { mutableStateOf(false) }
+var selectedOption by rememberSaveable { mutableStateOf("") }
+
+ExposedDropdownMenuBox(
+    expanded = showMenu,
+    onExpandedChange = { showMenu = !showMenu }
+) {
+    OutlinedTextField(
+        value = selectedOption,
+        onValueChange = {
+            selectedOption = it
+            showMenu = it.isNotEmpty()
+        },
+        label = { Text("Clase (editable con autocomplete)") },
+        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = showMenu) },
+        modifier = Modifier.menuAnchor()
+    )
+    ExposedDropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
+        listOf("Bárbaro", "Brujo", "Guerrero", "Hechicero", "Mago").filter { it.contains(selectedOption, ignoreCase = true) }.forEach { option ->
+            DropdownMenuItem(
+                text = { Text(option) },
+                onClick = {
+                    selectedOption = option
+                    showMenu = false
+                }
+            )
+        }
+    }
+}

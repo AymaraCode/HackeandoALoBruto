@@ -1,0 +1,87 @@
+class AppPreferences(val context: Context) {
+
+    // En el model
+    companion object {
+        val NOMBRE = stringPreferencesKey("NOMBRE")
+        val EDAD = intPreferencesKey("EDAD")
+    }
+
+    // Definimos el DataStore
+    private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "mis_preferencias")
+
+    // Guardar el nombre en DataStore
+    suspend fun setNombre(nombre: String) {
+        context.dataStore.edit { preferencias ->
+            preferencias[NOMBRE] = nombre
+        }
+    }
+
+    // Obtener el nombre desde DataStore
+    fun getNombre(): Flow<String> {
+        return context.dataStore.data.map { preferencias ->
+            preferencias[NOMBRE] ?: "" // Si no hay nombre guardado, devuelve ""
+        }
+    }
+
+    // Guardar la edad en DataStore
+    suspend fun setEdad(edad: Int) {
+        context.dataStore.edit { preferencias ->
+            preferencias[EDAD] = edad
+        }
+    }
+
+    // Obtener la edad desde DataStore
+    fun getEdad(): Flow<Int> {
+        return context.dataStore.data.map { preferencias ->
+            preferencias[EDAD] ?: 0 // Si no hay edad guardada, devuelve 0
+        }
+    }
+}
+
+
+//EN el viewmodel
+class UsuarioViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val preferencias = AppPreferences(application.applicationContext)
+
+    private val _nombre = MutableLiveData<String>()
+    val nombre: LiveData<String> = _nombre
+
+    private val _edad = MutableLiveData<Int>()
+    val edad: LiveData<Int> = _edad
+
+    fun guardarNombre(nombre: String) {
+        viewModelScope.launch {
+            preferencias.setNombre(nombre)
+            _nombre.postValue("")
+        }
+    }
+
+    fun obtenerNombre() {
+        viewModelScope.launch {
+            preferencias.getNombre().collect { _nombre.postValue(it) }
+        }
+    }
+
+    fun guardarEdad(edad: Int) {
+        viewModelScope.launch {
+            preferencias.setEdad(edad)
+        }
+    }
+
+    fun obtenerEdad() {
+        viewModelScope.launch {
+            preferencias.getEdad().collect { _edad.postValue(it) }
+        }
+    }
+}
+
+
+//En el composable
+usuarioViewModel.obtenerNombre()
+
+TextField(
+    value = edad.toString(),
+    onValueChange = { usuarioViewModel.guardarEdad(it.toIntOrNull() ?: 0) },
+    label = { Text(text = "Edad") },
+)

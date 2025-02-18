@@ -1,0 +1,26 @@
+
+//La database raíz solo hay que cambiar lo que esta en comentarios
+
+@Database(entities = [MiEntidad::class], version = 1) //Cambiar la entidad  [MiEntidad::class, OtraEntidad::class] así más de una
+abstract class MiBaseDeDatos : RoomDatabase() {
+    abstract fun miEntidadDAO(): MiEntidadDAO  // Cambiar DAO según el nombre de tu clase DAO
+
+    companion object {
+        private var instance: MiBaseDeDatos? = null
+
+        fun getInstance(context: Context): MiBaseDeDatos {
+            return instance ?: synchronized(this) {
+                val instance = Room.databaseBuilder(
+                    context.applicationContext,
+                    MiBaseDeDatos::class.java,
+                    "mi_base_de_datos"  // Cambiar el nombre de la base de datos
+                ).build()
+                this.instance = instance
+                instance
+            }
+        }
+    }
+}
+
+
+vista vistamodelo usecase dao vistamodelo vista

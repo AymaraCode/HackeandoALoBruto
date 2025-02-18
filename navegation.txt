@@ -1,0 +1,103 @@
+package com.catata.bookviewmodelflows.navigation
+
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.catata.bookviewmodelflows.viewmodel.BookViewModel
+import com.catata.bookviewmodelflows.ui.screens.bookinfoscreen.BookInfoScreen
+import com.catata.bookviewmodelflows.ui.screens.mainscreen.MainScreen
+
+@Composable
+fun Navigation() {
+    val navController = rememberNavController()
+
+    val bookViewModel = remember { BookViewModel() }
+
+    NavHost(
+        navController = navController,
+        startDestination = Routes.Main, // Ruta por la que comenzará la aplicación,
+        enterTransition = { slideInHorizontally(initialOffsetX = { it }) },
+        exitTransition = { slideOutHorizontally(targetOffsetX = { -it }) },
+        popEnterTransition = { slideInHorizontally(initialOffsetX = { -it }) },
+        popExitTransition = { slideOutHorizontally(targetOffsetX = { it }) },
+    ) {
+        composable<Routes.Main> {
+            MainScreen(
+                onBookClick = {
+                    navController.navigate(Routes.BookInfo)
+                },
+                bookViewModel = bookViewModel
+            )
+        }
+
+        composable<Routes.BookInfo> {
+            BookInfoScreen(
+                onBackArrowClick = {
+                    navController.popBackStack()
+                },
+                bookViewModel = bookViewModel
+            )
+        }
+    }
+}
+
+
+//Routes.kt
+
+sealed class Routes{
+    // If the screen DOES NOT need to receive values, it is defined with: object
+    @Serializable
+    object First
+
+    // If the screen NEEDS to receive values, it is defined with: data class
+    @Serializable
+    data class Second(
+        // mandatory parameter
+        val name: String,
+        // optional parameter
+        val age: Int = 0
+    )
+}
+
+
+//Navigation.kt
+@Composable
+fun Navigation() {
+    // Constant to manage the state, must be propagated across all screens
+    val navController = rememberNavController()
+
+    // Element that knows the different screens and which is the first to launch
+    NavHost(
+        navController = navController,
+        startDestination = Routes.First // Route where the application starts
+    ) {
+        // Definition of the first screen
+        composable<Routes.First> {
+            FirstScreen(navController)
+        }
+
+        // Definition of the second screen
+        composable<Routes.Second> { 
+            // Parameters are obtained from the route to use them when loading the screen
+            val args = it.toRoute<Routes.Second>()
+            SecondScreen(navController, args.name, args.age)
+        }
+    }
+}
+
+
+//Metodos para navegar
+
+navController.navigate(
+                        Routes.Second(
+                            name = nameState,
+                            age = ageState.toIntOrNull() ?: 0
+                        )
+                    )
+
+
+navController.popBackStack()
